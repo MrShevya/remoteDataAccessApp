@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User List</title>
+</head>
+<body>
+
+<div>
+  <spa><a href="/main">Main page</a></spa>
+</div>
+
+<p>User List</p>
+
+<table border="1">
+  <thread>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Roles</th>
+      <th>Edit</th>
+    </tr>
+  </thread>
+  <tbody th:each="user : ${users}">
+  <td th:text="${user.id}"></td>
+  <td th:text="${user.username}"></td>
+  <td th:text="${user.roles}"></td>
+  <td><a th:href="@{/user/{userId}(userId=${user.id})}">Edit</a></td>
+  </tbody>
+</table>
+
+
+</body>
+</html>

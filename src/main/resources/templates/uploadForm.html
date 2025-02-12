@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Main Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+  <div>
+    <spa><a href="/user">User List</a></spa>
+  </div>
+
+  <div>
+  <form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+  </form>
+  </div>
+
+  <div>
+    <form method="post" enctype="multipart/form-data">
+      <input type="text" name="filename" placeholder="Введите имя файла" />
+      <input type="file" name="file">
+      <input type="hidden" value="${_csrt.token}" name="_csrt" />
+      <button type="submit">Жми</button>
+    </form>
+  </div>
+  <div>
+    <form method="post" action="filter">
+      <input type="text" name="filter">
+      <input type="hidden" value="${_csrt.token}" name="_csrt" />
+      <button type="submit">Найти</button>
+    </form>
+  </div>
+
+  <div>Список сообщений</div>
+<tr th:each="file : ${files}">
+  <div style="color:crimson">
+    <td th:text="${file.id}"></td>
+    <td><a th:text="${file.filename}" th:href="@{  '/main/download/' + ${file.fileStorageName} }" download></a></td>
+    <td th:text="${file.ownerUsername}"></td>
+
+  </div>
+</tr>
+
+</body>
+</html>
