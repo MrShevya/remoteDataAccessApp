@@ -43,6 +43,7 @@ public class MainController{
         return "uploadForm";
     }
 
+    // заранее хуйовый вариант, когда на один request path мы регаем методы, отличающиеся типом запроса - get/post
     @PostMapping("/main")
     public String add(
             @AuthenticationPrincipal User user,
@@ -52,6 +53,7 @@ public class MainController{
 
         FileObj fileObj = new FileObj(filename, user);
 
+        // такой логики в контроллере, конечно, быть не должно
         if(file != null) {
             File uploadDir = new File(uploadPath);
             if(!uploadDir.exists()){

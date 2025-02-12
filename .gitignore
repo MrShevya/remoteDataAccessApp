@@ -1,3 +1,4 @@
+# должно быть только то, что тебе нужно
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar

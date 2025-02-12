@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
+// нейминг хуйовый. обж никому и никогда не надо добавлять
 public class FileObj {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,7 +14,7 @@ public class FileObj {
     private String filename;
 
 
-    private UUID file_id;
+    private UUID file_id; // откуда этот шпион ? снейк кейс
 
     private String fileStorageName;
 
@@ -22,6 +23,7 @@ public class FileObj {
     @JoinColumn(name = "user_id")
     private User owner;
 
+    // полей у класса 5. очевидно, что должен быть констуктор без аргументов и с двумя полями
     public FileObj() {
     }
     public FileObj(String filename, User user) {

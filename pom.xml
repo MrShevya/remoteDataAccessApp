@@ -10,22 +10,25 @@
 	</parent>
 	<groupId>edu.shev</groupId>
 	<artifactId>myApp</artifactId>
+	<!-- имя приложения не кемел и не снейк, а бусами пишется. my-app -->
+	<!-- пакет будет называть слитно просто myapp -->
 	<version>0.0.1-SNAPSHOT</version>
 	<name>myApp</name>
 
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<!-- лишнее -->
+<!--	<url/>-->
+<!--	<licenses>-->
+<!--		<license/>-->
+<!--	</licenses>-->
+<!--	<developers>-->
+<!--		<developer/>-->
+<!--	</developers>-->
+<!--	<scm>-->
+<!--		<connection/>-->
+<!--		<developerConnection/>-->
+<!--		<tag/>-->
+<!--		<url/>-->
+<!--	</scm>-->
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -58,6 +61,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<!-- версии должны быть явно указаны, ко всему относится кроме того, что из Parent'a едет из dependencyManagement'a (у тебя это все бутовые зависимости, им не надо версию рисовать)-->
 		</dependency>
 
 		<dependency>
@@ -86,6 +90,8 @@
 	</dependencies>
 
 	<build>
+		<!-- собери jar'ник. запусти '> java -jar myApp.jar' . ну как? печет?' -->
+		<!-- см. spring-boot-maven-plugin -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

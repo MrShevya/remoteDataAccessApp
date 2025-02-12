@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/users")
 @PreAuthorize("hasAnyAuthority('ADMIN')")
 public class UserController {
+    // через автовайрд не надо привязывать. все пользуются конструкцией
+    // @RequiredArgsConstructor и финальными полями, куда заезжают зависимости через сгенерированный ломбоком контроллер.
+    // ограничение - вайринг только по типу. если нужен квалифаер - все то же самое, только конструктор создаешь руками и имееть власть над ним.
     @Autowired
     private UserRepo userRepo;
 

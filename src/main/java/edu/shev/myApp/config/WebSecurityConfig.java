@@ -4,6 +4,7 @@ import edu.shev.myApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true) // впервые сталкиваюсь
 public class WebSecurityConfig {
 
     @Autowired
@@ -23,6 +24,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // форматирование вложений пиздецовое
         http
                 .authorizeHttpRequests((requests) -> requests // включаем авторизацию
                         .requestMatchers("/", "/registration", "/login").permitAll() // разрешаем полный доступ без авторизации
@@ -40,7 +42,7 @@ public class WebSecurityConfig {
 
 
 
-
+    // че тут происходит?
     @Autowired
     public void userDetailsService(
             AuthenticationManagerBuilder builder
@@ -48,4 +50,14 @@ public class WebSecurityConfig {
         builder.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
+
+    // если надо настроить билдер? мб так?
+//    @Bean
+//    @Primary
+//    public AuthenticationManagerBuilder authenticationManagerBuilder(AuthenticationManagerBuilder builder,
+//                                                                     UserService userService) throws Exception {
+//        builder.userDetailsService(userService)
+//               .passwordEncoder(NoOpPasswordEncoder.getInstance());
+//        return builder;
+//    }
     }
