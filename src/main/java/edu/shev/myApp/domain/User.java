@@ -4,18 +4,23 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "usr")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false, unique = true)
     private Long id;
+    @Column(nullable = false)
     private String username;
+    @Column(nullable = false)
     private String password;
     private boolean active;
+
+    @ManyToMany(mappedBy = "recievers")
+    private List<FileSystem> recievedFiles = new ArrayList<>();
 
     //Ролевая система
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER) // формирует доп таблицу для хранения enum, fetch - подгрузка(в данном случае жадная, есть еще ленивая)
@@ -34,6 +39,10 @@ public class User implements UserDetails {
 
     public String getUsername() {
         return username;
+    }
+
+    public List<FileSystem> getFiles(){
+        return recievedFiles;
     }
 
     @Override

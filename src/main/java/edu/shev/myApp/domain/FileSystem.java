@@ -1,30 +1,42 @@
 package edu.shev.myApp.domain;
 
 import jakarta.persistence.*;
+import org.hashids.Hashids;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
-public class FileObj {
+public class FileSystem {
+    @Value("${salt}")
+    private String salt;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String filename;
 
-
-    private UUID file_id;
-
-    private String fileStorageName;
-
+    private String link;
 
     @ManyToOne(fetch = FetchType.EAGER) // связь: одному пользователю пренадлежат множество сообщений // eager: каждый раз, когда получаем файл, должны получить информацию об авторе
     @JoinColumn(name = "user_id")
     private User owner;
 
-    public FileObj() {
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_file",
+    joinColumns = @JoinColumn(name = "file_id"),
+    inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> recievers = new ArrayList<>();
+
+
+
+    public FileSystem() {
     }
-    public FileObj(String filename, User user) {
+
+    public FileSystem(String filename, User user) {
         this.owner = user;
         this.filename = filename;
     }
@@ -57,20 +69,28 @@ public class FileObj {
         this.owner = owner;
     }
 
-    public UUID getFile_id() {
-        return file_id;
+    public ArrayList<Long> getRecievers() {
+        ArrayList<Long> recieversIds = new ArrayList<>();
+        recievers.forEach(User -> recieversIds.add(User.getId()));
+        return recieversIds;
     }
 
-    public void setFile_id(UUID file_id) {
-        this.file_id = file_id;
+
+    public void addReciever(User reciever){
+        this.recievers.add(reciever);
+        reciever.getFiles().add(this);
     }
 
-    public String getFileStorageName() {
-        return fileStorageName;
+    public void removeReciever(User reciever){          //this.recievers.removeIf(User -> User.equals(reciever));
+        this.recievers.remove(reciever);
+        reciever.getFiles().remove(this);
+
     }
 
-    public void setFileStorageName(String fileStorageName) {
-        this.fileStorageName = fileStorageName;
+    public String getLink(){
+        return link;
     }
+
+
 
 }

@@ -15,6 +15,8 @@ import java.util.Arrays;
 @RequestMapping("/user")
 @PreAuthorize("hasAnyAuthority('ADMIN')")
 public class UserController {
+
+
     @Autowired
     private UserRepo userRepo;
 

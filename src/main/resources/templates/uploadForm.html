@@ -3,6 +3,7 @@
 <head>
   <title>Main Page</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link href="../static/css/layout.css" th:href="@{/css/layout.css}" rel="stylesheet" />
 </head>
 <body>
 
@@ -18,7 +19,6 @@
 
   <div>
     <form method="post" enctype="multipart/form-data">
-      <input type="text" name="filename" placeholder="Введите имя файла" />
       <input type="file" name="file">
       <input type="hidden" value="${_csrt.token}" name="_csrt" />
       <button type="submit">Жми</button>
@@ -32,15 +32,29 @@
     </form>
   </div>
 
-  <div>Список сообщений</div>
-<tr th:each="file : ${files}">
-  <div style="color:crimson">
-    <td th:text="${file.id}"></td>
-    <td><a th:text="${file.filename}" th:href="@{  '/main/download/' + ${file.fileStorageName} }" download></a></td>
-    <td th:text="${file.ownerUsername}"></td>
+  <div>Директория</div>
 
-  </div>
-</tr>
+
+    <tr th:each="file : ${files}">
+      <div class="file-item">
+        <td th:text="${file.id}"></td>
+
+
+
+        <td>
+          <a class="file-link" th:text="${file.filename}" th:href="@{ '/main/download/' + ${file.filename} }" download></a>
+        </td>
+        <td class="file-owner" th:text="${file.ownerUsername}"></td>
+
+        <td>
+          <div class="file-recievers" th:each="file_reciever : ${file.recievers}">
+            <div th:text="${file_reciever}"></div>
+          </div>
+        </td>
+
+      </div>
+    </tr>
+
 
 </body>
 </html>
