@@ -42,7 +42,7 @@
 
 
         <td>
-          <a class="file-link" th:text="${file.filename}" th:href="@{ '/main/download/' + ${file.filename} }" download></a>
+          <a class="file-link" th:text="${file.filename}" th:href="@{ '/main/download/' + ${file.getLink()} }" download></a>
         </td>
         <td class="file-owner" th:text="${file.ownerUsername}"></td>
 

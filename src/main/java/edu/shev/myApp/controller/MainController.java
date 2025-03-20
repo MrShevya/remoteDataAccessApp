@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-
-
 @Controller
 public class MainController{
     @Autowired
@@ -34,10 +33,10 @@ public class MainController{
     private String uploadPath;
 
     @GetMapping("/")
-    public String poopoo(){
+    public String login(){
+        //сделать логику редиректа на main если человек залогинен
         return "login";
     }
-
 
     @GetMapping("/main")
     public  String main(Model model){
@@ -59,7 +58,8 @@ public class MainController{
             Path uploadDir = Paths.get(uploadPath);
             if(!Files.exists(uploadDir)){
                 Files.createDirectory(uploadDir);
-            }
+            } // TODO сделать проверку файла на существование и запрещать загрузку
+              // TODO сделать загрузку в папки по юзернеймам и айдипользователя(лучше сделать хеши из них и называть папки хешами)
 
             Path fileUploadPath = Paths.get(uploadDir + "/" + file.getOriginalFilename());
             try (InputStream is = file.getInputStream()){
@@ -77,15 +77,14 @@ public class MainController{
 
         return "uploadForm";
     }
-
-
-
-    //@PreAuthorize("")
     @RequestMapping(value = "/main/download/{file_name}", method = RequestMethod.GET)
-    public ResponseEntity<Resource> downloadFile(@PathVariable("file_name") String fileStorageName){
+    @PreAuthorize(value = "@filesRepo.findById(#file_name).get().owner.id eq authentication.principal.id") // || returnObject.recievers.contains(principal.username) == true
+    public ResponseEntity<Resource> downloadFile(
+            @Param("file_name")
+            @PathVariable
+                    ("file_name") Long fileStorageName){
         final HttpHeaders httpHeaders = new HttpHeaders();
-        final File file = new File(uploadPath + "/" + fileStorageName);
-        //final Path file2 = new Files(uploadPath + "/" + fileStorageName);
+        final File file = new File(uploadPath + "/" + filesRepo.findById(fileStorageName).get().getFilename());
         final FileSystemResource resource = new FileSystemResource(file);
         httpHeaders.set(HttpHeaders.LAST_MODIFIED, String.valueOf(file.lastModified()));
         httpHeaders.set(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.length()));
@@ -96,13 +95,11 @@ public class MainController{
                 .body(resource);
     }
 
-
     @PostMapping("filter")
     public String filter(@RequestParam String filter, Model model){
         List<FileSystem> files = filesRepo.findByFilenameStartingWith(filter);
         model.addAttribute("files", files);
         return "uploadForm";
     }
-
 
 }

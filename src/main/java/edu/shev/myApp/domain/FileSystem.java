@@ -3,7 +3,9 @@ package edu.shev.myApp.domain;
 import jakarta.persistence.*;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +90,7 @@ public class FileSystem {
     }
 
     public String getLink(){
-        return link;
+        return getId().toString();
     }
 
 
