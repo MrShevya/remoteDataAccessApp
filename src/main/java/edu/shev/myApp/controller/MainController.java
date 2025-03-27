@@ -3,6 +3,7 @@ package edu.shev.myApp.controller;
 import edu.shev.myApp.domain.FileSystem;
 import edu.shev.myApp.domain.User;
 import edu.shev.myApp.repos.FilesRepo;
+import edu.shev.myApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -25,21 +26,23 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
-public class MainController{
+public class MainController {
     @Autowired
     private FilesRepo filesRepo;
 
+    @Autowired
+    private UserRepo userRepo;
     @Value("${upload.path}")
     private String uploadPath;
 
     @GetMapping("/")
-    public String login(){
-        //сделать логику редиректа на main если человек залогинен
+    public String login() {
+        // TODO сделать логику редиректа на main если человек залогинен
         return "login";
     }
 
     @GetMapping("/main")
-    public  String main(Model model){
+    public String main(Model model) {
         //Iterable<File> files = filesRepo.findAll();
         model.addAttribute("files", filesRepo.findAll());
         return "uploadForm";
@@ -49,24 +52,24 @@ public class MainController{
     @PostMapping("/main")
     public String add(
             @AuthenticationPrincipal User user,
-            @RequestParam("file")MultipartFile file,
+            @RequestParam("file") MultipartFile file,
             Model model) throws IOException {
 
-        FileSystem fileSystem = new FileSystem(file.getOriginalFilename() , user); // создается экземпляр файла для хранения в репозитории
+        FileSystem fileSystem = new FileSystem(file.getOriginalFilename(), user); // создается экземпляр файла для хранения в репозитории
 
-        if(file != null) { // проверка существования директории и создание если ее не существует
+        if (file != null) { // проверка существования директории и создание если ее не существует
             Path uploadDir = Paths.get(uploadPath);
-            if(!Files.exists(uploadDir)){
+            if (!Files.exists(uploadDir)) {
                 Files.createDirectory(uploadDir);
             } // TODO сделать проверку файла на существование и запрещать загрузку
-              // TODO сделать загрузку в папки по юзернеймам и айдипользователя(лучше сделать хеши из них и называть папки хешами)
+            //   TODO сделать загрузку в папки по юзернеймам и айдипользователя(лучше сделать хеши из них и называть папки хешами)
 
             Path fileUploadPath = Paths.get(uploadDir + "/" + file.getOriginalFilename());
-            try (InputStream is = file.getInputStream()){
-            Files.copy(is, fileUploadPath);   //сохранение файла на диск
+            try (InputStream is = file.getInputStream()) {
+                Files.copy(is, fileUploadPath);   //сохранение файла на диск
             }
-                            //  возможна реализация через multipartFile file
-                            //  file.transferTo()
+            //  возможна реализация через multipartFile file
+            //  file.transferTo()
         }
 
         filesRepo.save(fileSystem);
@@ -77,12 +80,14 @@ public class MainController{
 
         return "uploadForm";
     }
+
     @RequestMapping(value = "/main/download/{file_name}", method = RequestMethod.GET)
-    @PreAuthorize(value = "@filesRepo.findById(#file_name).get().owner.id eq authentication.principal.id") // || returnObject.recievers.contains(principal.username) == true
+    @PreAuthorize(value = "@filesRepo.findById(#file_name).get().owner.id eq authentication.principal.id  or" +
+            " @filesRepo.findById(#file_name).get().recievers.contains(authentication.principal.id) == true")
     public ResponseEntity<Resource> downloadFile(
             @Param("file_name")
-            @PathVariable
-                    ("file_name") Long fileStorageName){
+            @PathVariable("file_name")
+            Long fileStorageName) {
         final HttpHeaders httpHeaders = new HttpHeaders();
         final File file = new File(uploadPath + "/" + filesRepo.findById(fileStorageName).get().getFilename());
         final FileSystemResource resource = new FileSystemResource(file);
@@ -96,10 +101,28 @@ public class MainController{
     }
 
     @PostMapping("filter")
-    public String filter(@RequestParam String filter, Model model){
+    public String filter(@RequestParam String filter, Model model) {
         List<FileSystem> files = filesRepo.findByFilenameStartingWith(filter);
         model.addAttribute("files", files);
         return "uploadForm";
+    }
+
+    @PostMapping("addreciever")
+    public String addReciever(@AuthenticationPrincipal User user,
+                                @RequestParam(name = "reciever") Long rec,
+                                @RequestParam(name = "fileId") Long fileId){
+        filesRepo.findById(fileId).get().addReciever(userRepo.findById(rec).get());
+        filesRepo.save(filesRepo.findById(fileId).get());
+        return "redirect:/main";
+    }
+
+    @PostMapping("removereciever")
+    public String removeReciever(@AuthenticationPrincipal User user,
+                              @RequestParam(name = "reciever") Long rec,
+                              @RequestParam(name = "fileId") Long fileId){
+        filesRepo.findById(fileId).get().removeReciever(userRepo.findById(rec).get());
+        filesRepo.save(filesRepo.findById(fileId).get());
+        return "redirect:/main";
     }
 
 }

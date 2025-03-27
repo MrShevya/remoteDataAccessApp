@@ -15,7 +15,7 @@
 
 
     <input type="hidden" th:value="${user.id}" name="userId">
-    <input type="hidden" value="${_csrt.token}" name="_csrt" />
+    <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
     <button type="submit">Save</button>
 </form>
 </body>

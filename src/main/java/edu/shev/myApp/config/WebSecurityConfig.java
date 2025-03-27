@@ -8,9 +8,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +25,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        HttpSessionCsrfTokenRepository csrfTokenRepository = new HttpSessionCsrfTokenRepository();
         http
                 .authorizeHttpRequests((requests) -> requests // включаем авторизацию
                         .requestMatchers("/", "/registration", "/login").permitAll() // разрешаем полный доступ без авторизации
@@ -30,7 +33,11 @@ public class WebSecurityConfig {
                         .requestMatchers("/main/download/{file_name}").authenticated()
                         .anyRequest().authenticated() // для всех остальных запросов требуем авторизацию
                 )
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler())// есть еще разные другие Csrf хендлеры
+                        .csrfTokenRepository(csrfTokenRepository) // настройка того, где лежит токен(на сервере или клиенте)
+                        .sessionAuthenticationStrategy(new CsrfAuthenticationStrategy(csrfTokenRepository))
+                    //    .ignoringRequestMatchers("")    // не применять csrf для данных url
+                )
                 .formLogin((form) -> form // включаем логин форму
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -43,8 +50,6 @@ public class WebSecurityConfig {
     }
 
 
-
-
     @Autowired
     public void userDetailsService(
             AuthenticationManagerBuilder builder
@@ -52,4 +57,4 @@ public class WebSecurityConfig {
         builder.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
-    }
+}

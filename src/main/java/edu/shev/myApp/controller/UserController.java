@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -21,14 +24,14 @@ public class UserController {
     private UserRepo userRepo;
 
     @GetMapping
-    public String userList(Model model){
+    public String userList(Model model) {
         model.addAttribute("users", userRepo.findAll());
 
         return "userList";
     }
 
     @GetMapping("{user}")
-    public String userEditForm(@PathVariable User user, Model model){
+    public String userEditForm(@PathVariable User user, Model model) {
         model.addAttribute("user", user);
         model.addAttribute("roles", Role.values());
         return "userEdit";
@@ -37,16 +40,21 @@ public class UserController {
     @PostMapping
     public String userEditFormSave(
             @RequestParam("userId") User user,     // тут по параметру userId мы получаем всего юзера
-            @RequestParam(name="roles[]", required = false) String[] roles,
-            @RequestParam String username)
-    {
+            @RequestParam(name = "roles[]", required = false) String[] roles,
+            @RequestParam String username) {
         user.setUsername(username);
         user.getRoles().clear();
-        if(roles!= null){
-            Arrays.stream(roles).forEach(r -> user.getRoles().add(Role.valueOf(r)));
+        Set<String> actRoles = Arrays.stream(roles).collect(Collectors.toSet());
+
+        Set<Role> actRols = new HashSet<>();
+
+        for (String role : actRoles) {
+            actRols.add(Role.valueOf(role));
         }
+        user.setRoles(actRols);
         userRepo.save(user);
         return "redirect:/user";
     }
+
 
 }

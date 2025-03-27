@@ -8,6 +8,7 @@
     <p th:text="${param.alert}"></p>
 </div>
 <form th:action="@{/registration}" method="post">
+    <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
     <div><label> User Name : <input type="text" name="username"/> </label></div>
     <div><label> Password: <input type="password" name="password"/> </label></div>
     <div><input type="submit" value="Register"/></div>

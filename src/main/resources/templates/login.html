@@ -16,6 +16,7 @@
         You have been logged out.
     </div>
     <form th:action="@{/login}" method="post" class="login-form">
+        <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
         <div><label> User Name : <input type="text" name="username" placeholder="Enter your username" /> </label></div>
         <div><label> Password: <input type="password" name="password" placeholder="Enter your password"/> </label></div>
         <div><input type="submit" value="Sign In" href="/main"/></div>

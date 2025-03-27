@@ -7,11 +7,11 @@
 </head>
 <body>
 
-  <div>
+  <div th:if="${#strings.contains(#authentication.principal.authorities, 'ADMIN')}">
     <spa><a href="/user">User List</a></spa>
   </div>
 
-  <div>
+  <div class="logout-btn">
   <form th:action="@{/logout}" method="post">
     <input type="submit" value="Sign Out"/>
   </form>
@@ -20,14 +20,14 @@
   <div>
     <form method="post" enctype="multipart/form-data">
       <input type="file" name="file">
-      <input type="hidden" value="${_csrt.token}" name="_csrt" />
+      <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
       <button type="submit">Жми</button>
     </form>
   </div>
   <div>
     <form method="post" action="filter">
       <input type="text" name="filter">
-      <input type="hidden" value="${_csrt.token}" name="_csrt" />
+      <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
       <button type="submit">Найти</button>
     </form>
   </div>
@@ -35,26 +35,77 @@
   <div>Директория</div>
 
 
-    <tr th:each="file : ${files}">
-      <div class="file-item">
-        <td th:text="${file.id}"></td>
+    <div th:each="file : ${files}" class="file-item">
 
+        <div th:text="${file.id}"></div>
 
+        <a class="file-link" th:text="${file.filename}" th:href="@{ '/main/download/' + ${file.getLink()} }" download></a>
 
-        <td>
-          <a class="file-link" th:text="${file.filename}" th:href="@{ '/main/download/' + ${file.getLink()} }" download></a>
-        </td>
-        <td class="file-owner" th:text="${file.ownerUsername}"></td>
+        <div class="file-owner" th:text="${file.ownerUsername}"></div>
 
-        <td>
           <div class="file-recievers" th:each="file_reciever : ${file.recievers}">
             <div th:text="${file_reciever}"></div>
           </div>
-        </td>
-
-      </div>
-    </tr>
 
 
+          <dialog th:id="'modal-' + ${file.id}" class="modal">
+            <div class="modal__inner">
+              <h1>Информация о файле:</h1>
+              <div class="file-recievers-access-visible" th:if="${file.owner.id} eq ${#authentication.principal.id}">
+              <h1>Изменить права на файл:</h1>
+              <form action="#" data-th-action="@{/addreciever}" method="post" class="file-recievers-add">
+                <input type="text" th:name="reciever" id="reciever" th:id="${reciever}">
+                <input type="hidden" th:value="${file.id}" th:name="fileId">
+                <input type="hidden" data-th-name="${_csrf.parameterName}" data-th-value="${_csrf.token}" name="_csrf" />
+                <button type="submit">Жми</button>
+              </form>
+              </div>
+
+              <h1>Те, кому доступен файл:</h1>
+              <div class="file-recievers" th:each="file_reciever : ${file.recievers}">
+                <div th:text="${@userRepo.findById(file_reciever).get().getUsername()}"></div>
+                <form action="#" data-th-action="@{/removereciever}" method="post" class="file-recievers-remove" th:if="${file.owner.id} eq ${#authentication.principal.id}">
+                  <input type="hidden" th:value="${file.id}" th:name="fileId">
+                  <input type="hidden" th:value="${file_reciever}" th:name="reciever">
+                  <button type="submit">X</button>
+                </form>
+              </div>
+              <button th:onclick="'closeModal(\'' + ${file.id} + '\')'" class="closeModal">Подтвердить</button>
+            </div>
+          </dialog>
+
+          <button th:onclick="'openModal(\'' + ${file.id} + '\')'" class="openModal">Сделать иконку</button>
+
+    </div>
+
+
+  <script>
+    function openModal(fileId) {
+      const modal = document.getElementById('modal-' + fileId);
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeModal(fileId) {
+      const modal = document.getElementById('modal-' + fileId);
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Закрытие модального окна при клике вне его содержимого
+    document.addEventListener('DOMContentLoaded', function() {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        modal.addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
+

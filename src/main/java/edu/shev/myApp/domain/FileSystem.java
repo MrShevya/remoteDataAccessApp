@@ -3,7 +3,6 @@ package edu.shev.myApp.domain;
 import jakarta.persistence.*;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,17 +22,16 @@ public class FileSystem {
 
     private String link;
 
-    @ManyToOne(fetch = FetchType.EAGER) // связь: одному пользователю пренадлежат множество сообщений // eager: каждый раз, когда получаем файл, должны получить информацию об авторе
+    @ManyToOne(fetch = FetchType.EAGER)
+    // связь: одному пользователю пренадлежат множество сообщений // eager: каждый раз, когда получаем файл, должны получить информацию об авторе
     @JoinColumn(name = "user_id")
     private User owner;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_file",
-    joinColumns = @JoinColumn(name = "file_id"),
-    inverseJoinColumns = @JoinColumn(name = "user_id"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_id"))
     private List<User> recievers = new ArrayList<>();
-
-
 
     public FileSystem() {
     }
@@ -63,7 +61,7 @@ public class FileSystem {
         return owner;
     }
 
-    public String getOwnerUsername(){
+    public String getOwnerUsername() {
         return owner != null ? owner.getUsername() : "<none>";
     }
 
@@ -78,21 +76,19 @@ public class FileSystem {
     }
 
 
-    public void addReciever(User reciever){
-        this.recievers.add(reciever);
-        reciever.getFiles().add(this);
+    public void addReciever(User reciever) {
+        recievers.add(reciever);
+        //reciever.addFiles(this);
     }
 
-    public void removeReciever(User reciever){          //this.recievers.removeIf(User -> User.equals(reciever));
-        this.recievers.remove(reciever);
-        reciever.getFiles().remove(this);
+    public void removeReciever(User reciever) {          //this.recievers.removeIf(User -> User.equals(reciever));
+        recievers.remove(reciever);
 
     }
 
-    public String getLink(){
+    public String getLink() {
         return getId().toString();
     }
-
 
 
 }

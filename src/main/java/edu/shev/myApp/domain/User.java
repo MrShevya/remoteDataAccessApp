@@ -19,12 +19,17 @@ public class User implements UserDetails {
     private String password;
     private boolean active;
 
-    @ManyToMany(mappedBy = "recievers")
+    @ManyToMany()
+    @JoinTable(name = "user_file",
+            joinColumns = @JoinColumn(name = "file_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<FileSystem> recievedFiles = new ArrayList<>();
 
     //Ролевая система
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER) // формирует доп таблицу для хранения enum, fetch - подгрузка(в данном случае жадная, есть еще ленивая)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id")) // аннотация говорит, что поле будет храниться в отдельной таблице, для которой мы не описывали маппинг ранее + связь таблицы с текущей таблицы
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    // формирует доп таблицу для хранения enum, fetch - подгрузка(в данном случае жадная, есть еще ленивая)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    // аннотация говорит, что поле будет храниться в отдельной таблице, для которой мы не описывали маппинг ранее + связь таблицы с текущей таблицы
     @Enumerated(EnumType.STRING)
     private Set<Role> roles; // роли пользователя
 
@@ -41,8 +46,12 @@ public class User implements UserDetails {
         return username;
     }
 
-    public List<FileSystem> getFiles(){
+    public List<FileSystem> getFiles() {
         return recievedFiles;
+    }
+
+    public void addFiles(FileSystem file) {
+        recievedFiles.add(file);
     }
 
     @Override
