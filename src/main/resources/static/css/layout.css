@@ -1,22 +1,59 @@
 /* styles.css */
+body{
+    font-size: 24px;
+    background-color:  #212121;
+    color: white;
+}
+
+button{
+    border: none;
+    padding: 0;
+    background-color: #212121;
+    color: white;
+    text-decoration-skip-ink: all;
+}
+
+a{
+
+    text-decoration:none;
+    background-color: transparent;
+    color: white;
+}
+
+a:visited {
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.roboto {
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings:
+            "wdth" 100;
+    color: white;
+}
+
 .file-item {
     display: block;
-    margin-bottom: 10px;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9;
+    margin-left: 5%;
+    margin-bottom: 5px;
+    background-color: #424242;
     transition: background-color 0.3s ease; /* Плавное изменение фона */
 }
 
 .file-item:hover {
-    background-color: #f1f1f1;
+    background-color: #616161;
     cursor: pointer;
 }
 
 .file-link {
+    text-decoration-skip-ink: all;
     text-decoration: none;
-    color: #1a73e8;
+    color: green;
 }
 
 .file-link:hover {
@@ -52,3 +89,34 @@
     max-width: 500px;
     width: 80%;
 }
+
+
+ .material-symbols-outlined {
+     font-variation-settings:
+             'FILL' 0,
+             'wght' 400,
+             'GRAD' 0,
+             'opsz' 48;
+ }
+
+.icon-hover{
+    transition: font-variation-settings 0.3s;
+}
+
+
+
+.icon-hover:hover{
+     font-variation-settings:
+             'FILL' 1,
+             'wght' 400,
+             'GRAD' 0,
+             'opsz' 48;
+ }
+
+ .icon:active{
+     font-variation-settings:
+     'FILL' 1,
+     'wght' 100,
+     'GRAD' 0,
+     'opsz' 48;
+ }

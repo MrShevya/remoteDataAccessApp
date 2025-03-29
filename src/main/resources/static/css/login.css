@@ -2,7 +2,7 @@
 /* Общие стили для страницы */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color:  #212121;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,10 +12,9 @@ body {
 
 /* Контейнер для формы */
 .login-container {
-    background-color: #ffffff;
+    background-color: #424242;
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -24,7 +23,7 @@ body {
 /* Заголовок */
 .login-container h1 {
     margin-bottom: 1.5rem;
-    color: #333;
+    color: white;
     font-size: 24px;
 }
 
@@ -37,8 +36,8 @@ body {
 }
 
 .login-container .message.error {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: #6c4848;
+    color: white;
 }
 
 .login-container .message.logout {
@@ -51,18 +50,21 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    color: #afafaf;
 }
 
 .login-form label {
     font-size: 14px;
-    color: #555;
+    color: #afafaf;
     text-align: left;
 }
 
 .login-form input[type="text"],
 .login-form input[type="password"] {
+    color: white;
+    background-color:  #616161;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid #616161;
     border-radius: 4px;
     font-size: 14px;
     width: 100%;
@@ -71,13 +73,14 @@ body {
 
 .login-form input[type="text"]:focus,
 .login-form input[type="password"]:focus {
-    border-color: #1a73e8;
+    transition: border-color 0.3s ease;
+    border-color: black;
     outline: none;
 }
 
 /* Кнопка входа */
 .login-form input[type="submit"] {
-    background-color: #1a73e8;
+    background-color: #616161;
     color: white;
     padding: 0.75rem;
     border: none;
@@ -95,7 +98,7 @@ body {
 .register-link {
     margin-top: 1rem;
     font-size: 14px;
-    color: #1a73e8;
+    color: #616161;
     text-decoration: none;
 }
 

@@ -80,6 +80,15 @@ public class MainController {
 
         return "uploadForm";
     }
+    @PostMapping("removefile")
+    String removeFile(@AuthenticationPrincipal User user,
+                      @RequestParam(name = "fileId") Long fileId){
+        if (filesRepo.existsById(fileId)) {
+            filesRepo.deleteById(fileId);
+        }
+        return "redirect:/main";
+    }
+
 
     @RequestMapping(value = "/main/download/{file_name}", method = RequestMethod.GET)
     @PreAuthorize(value = "@filesRepo.findById(#file_name).get().owner.id eq authentication.principal.id  or" +
@@ -98,6 +107,7 @@ public class MainController {
                 .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+
     }
 
     @PostMapping("filter")
