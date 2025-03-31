@@ -4,6 +4,7 @@ import edu.shev.myApp.domain.FileSystem;
 import edu.shev.myApp.domain.User;
 import edu.shev.myApp.repos.FilesRepo;
 import edu.shev.myApp.repos.UserRepo;
+import edu.shev.myApp.service.FilesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -35,6 +36,9 @@ public class MainController {
     @Value("${upload.path}")
     private String uploadPath;
 
+
+    FilesService filesService = new FilesService(filesRepo);
+
     @GetMapping("/")
     public String login() {
         // TODO сделать логику редиректа на main если человек залогинен
@@ -48,31 +52,14 @@ public class MainController {
         return "uploadForm";
     }
 
-    // заранее хуйовый вариант, когда на один request path мы регаем методы, отличающиеся типом запроса - get/post
+
     @PostMapping("/main")
     public String add(
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file,
             Model model) throws IOException {
 
-        FileSystem fileSystem = new FileSystem(file.getOriginalFilename(), user); // создается экземпляр файла для хранения в репозитории
-
-        if (file != null) { // проверка существования директории и создание если ее не существует
-            Path uploadDir = Paths.get(uploadPath);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectory(uploadDir);
-            } // TODO сделать проверку файла на существование и запрещать загрузку
-            //   TODO сделать загрузку в папки по юзернеймам и айдипользователя(лучше сделать хеши из них и называть папки хешами)
-
-            Path fileUploadPath = Paths.get(uploadDir + "/" + file.getOriginalFilename());
-            try (InputStream is = file.getInputStream()) {
-                Files.copy(is, fileUploadPath);   //сохранение файла на диск
-            }
-            //  возможна реализация через multipartFile file
-            //  file.transferTo()
-        }
-
-        filesRepo.save(fileSystem);
+        filesService.addFile(file, user, "files", filesRepo);
 
         Iterable<FileSystem> files = filesRepo.findAll();
 
@@ -80,6 +67,30 @@ public class MainController {
 
         return "uploadForm";
     }
+
+    /*
+    @PostMapping("/main/{$currentDir}")
+    public String addInDir(
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file,
+            @PathVariable("currentDir") String currentDir,
+            Model model) throws IOException {
+
+        filesService.addFile(file, user, usercurrentDir);
+
+        Iterable<FileSystem> files = filesRepo.findAll();
+
+        model.addAttribute("files", files);
+
+        return "uploadForm";
+    }
+*/
+
+
+
+
+
+
     @PostMapping("removefile")
     String removeFile(@AuthenticationPrincipal User user,
                       @RequestParam(name = "fileId") Long fileId){
@@ -90,15 +101,17 @@ public class MainController {
     }
 
 
-    @RequestMapping(value = "/main/download/{file_name}", method = RequestMethod.GET)
-    @PreAuthorize(value = "@filesRepo.findById(#file_name).get().owner.id eq authentication.principal.id  or" +
-            " @filesRepo.findById(#file_name).get().recievers.contains(authentication.principal.id) == true")
+    @RequestMapping(value = "/main/download/{file_link}", method = RequestMethod.GET)
+    @PreAuthorize(value = "@filesRepo.findByLink(#file_link).owner.id eq authentication.principal.id  or" +
+            " @filesRepo.findByLink(#file_link).recievers.contains(authentication.principal.id) == true")
     public ResponseEntity<Resource> downloadFile(
-            @Param("file_name")
-            @PathVariable("file_name")
-            Long fileStorageName) {
+            @Param("file_link")
+            @PathVariable("file_link")
+            String fileLink) {
+        String filename = filesRepo.findByLink(fileLink).getFilename();
         final HttpHeaders httpHeaders = new HttpHeaders();
-        final File file = new File(uploadPath + "/" + filesRepo.findById(fileStorageName).get().getFilename());
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+        final File file = new File(uploadPath + "/" + filename);
         final FileSystemResource resource = new FileSystemResource(file);
         httpHeaders.set(HttpHeaders.LAST_MODIFIED, String.valueOf(file.lastModified()));
         httpHeaders.set(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.length()));

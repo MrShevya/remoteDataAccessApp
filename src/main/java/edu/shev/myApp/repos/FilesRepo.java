@@ -9,4 +9,5 @@ public interface FilesRepo extends CrudRepository<FileSystem, Long> {
 
     List<FileSystem> findByFilenameStartingWith(String prefix);
 
+    FileSystem findByLink(String link);
 }

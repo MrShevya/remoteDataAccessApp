@@ -1,12 +1,14 @@
 package edu.shev.myApp.domain;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
-import org.hashids.Hashids;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -19,6 +21,10 @@ public class FileSystem {
     private Integer id;
 
     private String filename;
+
+
+    private String absoluteFilePath;
+
 
     private String link;
 
@@ -36,9 +42,10 @@ public class FileSystem {
     public FileSystem() {
     }
 
-    public FileSystem(String filename, User user) {
-        this.owner = user;
+    public FileSystem(String filename, Path absoluteFilePath, User user) {
         this.filename = filename;
+        this.absoluteFilePath = absoluteFilePath.toString();
+        this.owner = user;
     }
 
     public Integer getId() {
@@ -86,8 +93,19 @@ public class FileSystem {
 
     }
 
+    public Path getAbsoluteFilePath(){return Path.of(absoluteFilePath);}
+
+    public void setAbsoluteFilePath(Path absoluteFilePath){this.absoluteFilePath = absoluteFilePath.toString();}
+
+
+    public void generateLink(){
+        String s = filename + absoluteFilePath ;
+        this.link = (UUID.nameUUIDFromBytes(s.getBytes())).toString();
+
+    }
+
     public String getLink() {
-        return getId().toString();
+        return link;
     }
 
 
